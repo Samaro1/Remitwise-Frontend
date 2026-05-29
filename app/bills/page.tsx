@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Loader2, Layers3, ShieldCheck, Wallet, Clock3 } from "lucide-react";
 import { UnpaidBillsSection } from "@/components/Bills/UnpaidBillsSection";
 import PageHeader from "@/components/PageHeader";
@@ -10,6 +10,8 @@ import { ActionState } from "@/lib/auth/middleware";
 import { useFormAction } from "@/lib/hooks/useFormAction";
 import AsyncOperationsPanel from "@/components/AsyncOperationsPanel";
 import AsyncSubmissionStatus from "@/components/AsyncSubmissionStatus";
+import { useToast } from "@/lib/context/ToastContext";
+import { mockBills } from "@/lib/mockdata/bills";
 
 type AddBillResponse = ActionState & {
 	name?: string;
@@ -79,6 +81,25 @@ const billQueue = [
 export default function Bills() {
 	const formSectionRef = useRef<HTMLDivElement>(null);
 	const [state, formAction, pending] = useFormAction<AddBillResponse>("/api/bills");
+	const { toast } = useToast();
+
+	useEffect(() => {
+		const overdueBill = mockBills.find((b) => b.status === "overdue");
+		if (overdueBill) {
+			toast({
+				variant: "warning",
+				title: "Bill overdue",
+				description: `${overdueBill.title} was due on ${overdueBill.dueDate}.`,
+				action: {
+					label: "Pay now",
+					onClick: () => {
+						const formElement = document.getElementById("name");
+						if (formElement) formElement.scrollIntoView({ behavior: "smooth" });
+					},
+				},
+			});
+		}
+	}, [toast]);
 
 	function handleAddBill() {
 		formSectionRef.current?.scrollIntoView({
@@ -126,11 +147,23 @@ export default function Bills() {
 								feedback. Longer-running submit states should move into a stack
 								that stays visible while the user continues working.
 							</p>
+						</div>
 						<div className='mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300'>
 							<p>
 								This bill request is built as an on-chain USDC payment payload. Your wallet signs and submits the transaction; RemitWise only prepares the payload.
 							</p>
 						</div>
+
+						<form className='mt-6 space-y-6' action={formAction}>
+							<div className='grid gap-1'>
+								<label className='block text-sm font-medium text-gray-300'>
+									Bill Name
+								</label>
+								<input
+									type='text'
+									id='name'
+									name='name'
+									defaultValue={state?.name}
 									placeholder='e.g., Electricity, School Fees, Rent'
 									className='w-full rounded-xl border border-white/10 bg-[#1a1a1a] px-4 py-3 text-white placeholder-gray-500 focus:border-transparent focus:ring-2 focus:ring-red-500'
 								/>
