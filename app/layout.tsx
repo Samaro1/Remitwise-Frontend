@@ -4,6 +4,7 @@ import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { DensityProvider } from "@/lib/context/DensityContext";
 import { ToastProvider } from "@/lib/context/ToastContext";
+import { ContractOperationsProvider } from "@/lib/context/ContractOperationsContext";
 import ToastRegion from "@/components/ToastRegion";
 import SessionExpiryProvider from "@/components/SessionExpiryProvider";
 
@@ -25,12 +26,14 @@ export default function RootLayout({
       <body className={`${inter.className} starry-bg min-h-screen`}>
         <ToastProvider>
           <DensityProvider>
-            <SessionExpiryProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-              <ToastRegion />
-            </SessionExpiryProvider>
+            <ContractOperationsProvider>
+              <SessionExpiryProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+                <ToastRegion />
+              </SessionExpiryProvider>
+            </ContractOperationsProvider>
           </DensityProvider>
         </ToastProvider>
       </body>
