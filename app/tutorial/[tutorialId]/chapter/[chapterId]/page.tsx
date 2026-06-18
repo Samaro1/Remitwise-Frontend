@@ -1,11 +1,11 @@
 import ChapterView from "../../../../../components/tutorials/ChapterView";
 
 type Props = {
-  params: { tutorialId: string; chapterId: string };
+  params: Promise<{ tutorialId: string; chapterId: string }>;
 };
 
-export default function TutorialChapterPage({ params }: Props) {
-  const { tutorialId, chapterId } = params;
+export default async function TutorialChapterPage({ params }: Props) {
+  const { tutorialId, chapterId } = await params;
   const chapterIndex = parseInt(chapterId, 10) || 0;
 
   // In a full implementation you'd fetch chapter data here.
